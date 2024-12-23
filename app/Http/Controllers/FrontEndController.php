@@ -16,9 +16,8 @@ class FrontEndController extends Controller
          // dd("session removed");
          $cart_items = session()->get('cart');
          $this->calculateTotal($request);
-         $cart_total = session()->get('cart_total');
          
-          return view('cart',['cart_items'=>$cart_items],['cart_total'=>$cart_total]);
+          return view('cart');
      }
      public function checkout(){
         return view('checkout');
@@ -69,8 +68,7 @@ class FrontEndController extends Controller
                $request->session()->put('cart',$cart);
                $cart_items = session()->get('cart');
                $this->calculateTotal($request);
-               $cart_total = session()->get('cart_total');
-               return view('cart',['cart_items'=>$cart_items],['cart_total'=>$cart_total]);
+               return view('cart');
                }
             
          }
@@ -94,18 +92,26 @@ class FrontEndController extends Controller
                $cart_items = session()->get('cart');
                $this->calculateTotal($request);
                $cart_total = session()->get('cart_total');
-               return view('cart',['cart_items'=>$cart_items],['cart_total'=>$cart_total]);
+               return view('cart');
          }
    }
 
    public function calculateTotal($request){
-      $cart_items = $request()->session()->get('cart');
+      $carts = $request->session()->get('cart');
       $cart_total = 0;
-      foreach($cart_items as $cart_item){
+      foreach($carts as $cart_item){
          $cart_total += $cart_item['quantity']*$cart_item['price'];
       }
-      
+
       $request->session()->put('cart_total',$cart_total);
 
+   }
+
+   public function remove_from_cart(Request $request){
+      $cart = $request->session()->get('cart');
+      $id_to_delete = $request->id;
+      unset($cart[$id_to_delete]);
+      $request->session()->put('cart',$cart);
+      return redirect()->back()->withErrors(['message'=>'Cart item deleted successfully']);
    }
 }

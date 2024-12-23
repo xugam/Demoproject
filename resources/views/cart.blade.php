@@ -8,6 +8,10 @@
     <section class="cart container mt-2 my-3 py-5">
         <div class="container mt-2">
             <h4>Your Cart</h4>
+            @foreach($errors->all() as $error)
+                        <h2>{{$error}}</h2>
+                    @endforeach
+
         </div>
 
         <table class="pt-5">
@@ -19,7 +23,7 @@
     
 
            @if(Session::has('cart'))
-           @foreach($cart_items as $product)
+           @foreach(Session::get('cart') as $product)
                     <tr>
                         <td>
                             <div class="product-info">
@@ -28,8 +32,9 @@
                                     <p>{{$product['name']}}</p>
                                     <small><span>$</span>{{$product['price']}}</small>
                                     <br>
-                                    <form > 
-                                      
+                                    <form action="{{ route('remove_from_cart')}}"  method="POST"> 
+                                      @csrf
+                                      <input type="hidden" name="id" value="{{$product['id']}}">
                                         <input type="submit" name="remove_btn" class="remove-btn" value="remove">
                                     </form>
                                 </div>
@@ -58,8 +63,11 @@
             <table>
       
                 <tr>
-                    <td>${{$cart_total}}</td>
-                    <td></td>
+                <td></td>
+                @if (Session::has('cart_total'))
+                <td>${{Session::get('cart_total')}}</td>
+                @endif
+                    
                 </tr>
            
             </table>
