@@ -42,7 +42,8 @@
                         </td>
 
                         <td>
-                            <form>
+                            <form action="{{ route('edit_cart')}}" method="POST">
+                                @csrf
                                 <input type="number" name="quantity" value="1">
                                 <input type="submit" value="edit" class="edit-btn" name="edit_product_quantity_btn">
                             </form>
@@ -76,7 +77,7 @@
 
         <div class="checkout-container">
        
-            <form >
+            <form  action="{{ route('checkout') }}" method="GET">
                 <input type="submit" class="btn checkout-btn" value="Checkout" name="">
             </form>
           

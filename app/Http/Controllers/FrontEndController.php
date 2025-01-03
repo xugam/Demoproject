@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -15,11 +18,11 @@ class FrontEndController extends Controller
          // $request->session()->remove('cart');
          // dd("session removed");
          $cart_items = session()->get('cart');
-         $this->calculateTotal($request);
-         
+         $request->session()->has('cart')?$this->calculateTotal($request):1;
           return view('cart');
      }
      public function checkout(){
+
         return view('checkout');
      }
      public function index(){
@@ -66,7 +69,6 @@ class FrontEndController extends Controller
                $cart[$request->id] = $product_array;
                
                $request->session()->put('cart',$cart);
-               $cart_items = session()->get('cart');
                $this->calculateTotal($request);
                return view('cart');
                }
@@ -89,9 +91,7 @@ class FrontEndController extends Controller
                );
                $cart[$request->id] = $product_array;
                $request->session()->put('cart',$cart);
-               $cart_items = session()->get('cart');
                $this->calculateTotal($request);
-               $cart_total = session()->get('cart_total');
                return view('cart');
          }
    }
@@ -114,4 +114,42 @@ class FrontEndController extends Controller
       $request->session()->put('cart',$cart);
       return redirect()->back()->withErrors(['message'=>'Cart item deleted successfully']);
    }
+
+   public function edit_cart(Request $request){
+      $quantity = $request->quantity;
+   }
+   public function place_order(Request $request){
+      // dd($request->all());
+ 
+      $order = new Order();
+      $order->name = $request->name;
+      $order->email = $request->email;
+      $order->city = $request->city;
+      $order->address = $request->address;
+      $order->phone = $request->phone;
+      $order->cost = $request->session()->get('cart_total');
+      $order->status = "not paid";
+      $order->date = date("y-m-d");
+      $order->save();
+
+      $cart = $request->session()->get('cart');
+
+      foreach($cart as $c){
+         $orderitem = new OrderItem();
+         $orderitem->order_id = $order->id;
+         $orderitem->product_id = $c['id'];
+         $orderitem->product_name = $c['name'];
+         $orderitem->product_price = $c['price'];
+         $orderitem->product_image = $c['image'];
+         $orderitem->product_quantity = $c['quantity'];
+         $orderitem->order_date = date("y-m-d");
+         $orderitem->save();
+      }
+
+      // order id
+      $request->session()->put('order_id',$order->id);
+        
+      return view('payment');
+   }
+   
 }

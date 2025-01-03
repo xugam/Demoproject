@@ -15,8 +15,8 @@
         </div>
 
         <div class="mx-auto container">
-            <form id="checkout-form">
-             
+            <form id="checkout-form" action="{{ route('place_order') }}" method="POST">
+             @csrf
                 <div class="form-group checkout-small-element">
                     <label for="">Name</label>
                     <input type="text" class="form-control" id="checkout-name" name="name" placeholder="name" required>
@@ -44,8 +44,11 @@
 
 
                 <div class="form-group checkout-btn-container">
-                    <p>Total amount: $199</p>
-                    <input type="submit" class="btn" id="checkout-btn" name="checkout_btn" value="Checkout">
+                @if (Session::has('cart_total'))
+                <p>Rs. {{Session::get('cart_total')}}</p>
+                <input type="submit" class="btn" id="checkout-btn" name="checkout_btn" value="Place Order">
+
+                @endif
                 </div>
         
             </form>
